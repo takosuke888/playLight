@@ -1,0 +1,3 @@
+*.json
+/static/icons*
+/static/pokemon
