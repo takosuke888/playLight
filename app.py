@@ -34,7 +34,7 @@ def index():
     
     # ランダムに4つの画像を選択
     selected_images = random.sample(all_images, 4)
-    selected_images = [icon_dir.split('/')[-1] + '/' + name for name in all_images]
+    selected_images = [icon_dir.split('/')[-1] + '/' + name for name in selected_images]
     
     # 中心画像
     center_image = "light.jpg"
