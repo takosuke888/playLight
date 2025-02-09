@@ -11,6 +11,9 @@ class SwitchBotAPI:
 
     def __init__(self):
 
+        self.switchbot_hostname = 'https://api.switchbot.net/v1.1/devices'
+        #self.switchbot_hostname = 'https://api.switch-bot.com/v1.1/devices'
+
         setting = open('switchbot_token.json', 'r')
         setting = json.load(setting)
     
@@ -20,6 +23,8 @@ class SwitchBotAPI:
 
         device_name = "ダイニング"
         self.bulb_device_id = self.get_deviceID_by_name(device_name)
+
+        self.generate_curl_bat()
 
     def create_header(self):
         nonce = uuid.uuid4()
@@ -43,8 +48,24 @@ class SwitchBotAPI:
             'nonce': str(nonce)
         }
 
+    def generate_curl_bat(self, output_file="switchbot_request.bat"):
+        curl_command = (
+            f'curl -X GET "{self.switchbot_hostname}" '
+            f'-H "Authorization: {self.header["Authorization"]}" '
+            f'-H "Content-Type: {self.header["Content-Type"]}" '
+            f'-H "charset: {self.header["charset"]}" '
+            f'-H "t: {self.header["t"]}" '
+            f'-H "sign: {self.header["sign"]}" '
+            f'-H "nonce: {self.header["nonce"]}"'
+        )
+
+        with open(output_file, "w", encoding="utf-8") as file:
+            file.write(f'@echo off\n{curl_command}\n')
+
+        print(f"バッチファイル {output_file} を生成しました。")
+
     def get_devices(self):
-        url = 'https://api.switch-bot.com/v1.1/devices'
+        url = self.switchbot_hostname
         response = requests.get(url, headers=self.header)
         if response.status_code == 200:
             return response.json()
@@ -52,7 +73,7 @@ class SwitchBotAPI:
             return f"Error: {response.status_code}, {response.json()}"
 
     def turn_on(self, device_id: str):
-        url = f'https://api.switch-bot.com/v1.1/devices/{device_id}/commands'
+        url = f'{self.switchbot_hostname}/{device_id}/commands'
         payload = {
             'command': 'turnOn', 
             "parameter": 'default',
@@ -64,7 +85,7 @@ class SwitchBotAPI:
             return f"Error: {response.status_code}, {response.json()}"
 
     def turn_off(self, device_id: str):
-        url = f'https://api.switch-bot.com/v1.1/devices/{device_id}/commands'
+        url = f'{self.switchbot_hostname}/{device_id}/commands'
         payload = {
             'command': 'turnOff', 
             "parameter": 'default',
@@ -76,7 +97,7 @@ class SwitchBotAPI:
             return f"Error: {response.status_code}, {response.json()}"
 
     def set_color(self, device_id: str, color: str):
-        url = f'https://api.switch-bot.com/v1.1/devices/{device_id}/commands'
+        url = f'{self.switchbot_hostname}/{device_id}/commands'
         payload = {
             'command': 'setColor', 
             "parameter": color,
@@ -88,7 +109,7 @@ class SwitchBotAPI:
             return f"Error: {response.status_code}, {response.json()}"
         
     def set_cct(self, device_id: str, cct: int):
-        url = f'https://api.switch-bot.com/v1.1/devices/{device_id}/commands'
+        url = f'{self.switchbot_hostname}/{device_id}/commands'
         payload = {
             'command': 'setColorTemperature', 
             "parameter": cct,
@@ -109,7 +130,7 @@ class SwitchBotAPI:
         return None
     
     def get_device_status(self, deviceId: str):
-        url = f'https://api.switch-bot.com/v1.1/devices/{deviceId}/status'
+        url = f'{self.switchbot_hostname}/{deviceId}/status'
         response = requests.get(url, headers=self.header)
         return response.json()
 

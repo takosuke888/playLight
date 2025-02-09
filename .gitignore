@@ -2,3 +2,4 @@
 /static/icons*
 /static/pokemon
 /__pycache__/*
+*.bat

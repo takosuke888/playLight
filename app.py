@@ -11,17 +11,17 @@ app = Flask(__name__)
 ICON_DIRS = ["static/pokemon", "static/icons"]
 
 color_dict = {
-    #"blue.png": "0:0:255",
-    #"green.png": "0:255:0",
-    #"lightblue.png": "0:255:255",
-    #"orange.png": "255:50:0",
-    #"red.png": "255:0:0",
-    #"yellow.png": "255:255:0",
+    "blue.png": "0:0:255",
+    "green.png": "0:255:0",
+    "lightblue.png": "0:255:255",
+    "orange.png": "255:50:0",
+    "red.png": "255:0:0",
+    "yellow.png": "255:255:0",
 
-    #"ashimari.png": "0:0:255",
-    #"hogeta.png": "255:0:0",
-    #"pikachu.png": "255:255:0",
-    #"sarunori.png": "50:200:10"
+    "ashimari.png": "0:0:255",
+    "hogeta.png": "255:0:0",
+    "pikachu.png": "255:255:0",
+    "sarunori.png": "50:200:10"
 }
 
 swithLED = switchbot_led_test.SwitchBotAPI()
@@ -67,8 +67,8 @@ def index():
     selected_images_paths = [icon_dir.split('/')[-1] + '/' + name for name in selected_images]
     
     # Color Dict を生成
-    for image in selected_images:
-        add_color_dict(os.path.join(icon_dir, image))
+    #for image in selected_images:
+    #    add_color_dict(os.path.join(icon_dir, image))
 
     print(color_dict)
 
