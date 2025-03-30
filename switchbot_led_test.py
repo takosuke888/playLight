@@ -24,7 +24,7 @@ class SwitchBotAPI:
         device_name = "ダイニング"
         self.bulb_device_id = self.get_deviceID_by_name(device_name)
 
-        self.generate_curl_bat()
+        #self.generate_curl_bat()
 
     def create_header(self):
         nonce = uuid.uuid4()
@@ -38,6 +38,8 @@ class SwitchBotAPI:
                 digestmod=hashlib.sha256
             ).digest()
         ).decode()
+
+        #print(timestamp)
 
         return {
             'Authorization': self.token,
