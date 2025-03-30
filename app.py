@@ -4,8 +4,18 @@ import os
 import switchbot_led_test
 import cv2
 from sklearn.cluster import KMeans
+import time
+
+import logging
+
+# ロガーの設定
+logging.basicConfig(filename='event_log.log', level=logging.INFO, format='%(asctime)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+
+# werkzeugのロガーのレベルを変更
+logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
 # アイコン画像のディレクトリを指定
 ICON_DIRS = ["static/pokemon", "static/icons"]
@@ -45,8 +55,6 @@ def extract_dominant_colors(image_path, n_colors=1):
 # SwitchBotAPIの形式に合わせたカラーコード辞書を設定
 def add_color_dict(image_path):
 
-    print(image_path)
-
     main_color = extract_dominant_colors(image_path, 3)
 
     # SwitchBotAPIの形式に合わせたカラーコード
@@ -70,13 +78,12 @@ def index():
     #for image in selected_images:
     #    add_color_dict(os.path.join(icon_dir, image))
 
-    print(color_dict)
-
     # 中心画像
     center_image = "light.jpg"
 
     # APIヘッダーの初期化
     swithLED.header = swithLED.create_header()
+    logger.info(f"Event: create_header, Header: {swithLED.header}")
 
     return render_template('index.html', center_image=center_image, images=selected_images_paths)
 
@@ -87,17 +94,17 @@ def change_light_color():
     image_path = request.json.get('image_path')  # POSTのJSONデータから取得
     image_name = image_path.split('/')[-1]
 
-    print(f"Clicked image: {image_name}")  # ターミナルにログ出力
-
     if image_name == 'light.jpg':
         swithLED.turn_on(swithLED.bulb_device_id)
+        time.sleep(1)
         swithLED.set_cct(swithLED.bulb_device_id, 5200)
+        time.sleep(3)
+        logger.info(f"Event: turn_on, DeviceID: {swithLED.bulb_device_id}")
         return '', 204
     else:
 
         # デバイスIDが見つからない場合の処理
         if not swithLED.bulb_device_id:
-            print("Device not found.")
             return "Device not found", 404
         
         if image_name in color_dict:
@@ -106,6 +113,8 @@ def change_light_color():
             return "Color not found", 404
 
         response = swithLED.set_color(swithLED.bulb_device_id, color)
+        time.sleep(3)
+        logger.info(f"Event: set_color, DeviceID: {swithLED.bulb_device_id}, 色: {color}")
 
         return '', 204  # レスポンスボディなし、ステータスコード204で終了
 

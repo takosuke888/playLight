@@ -7,6 +7,7 @@ import hmac
 import base64
 import requests
 import json
+
 class SwitchBotAPI:
 
     def __init__(self):
@@ -24,8 +25,6 @@ class SwitchBotAPI:
         device_name = "ダイニング"
         self.bulb_device_id = self.get_deviceID_by_name(device_name)
 
-        #self.generate_curl_bat()
-
     def create_header(self):
         nonce = uuid.uuid4()
         timestamp = int(round(time.time() * 1000))
@@ -39,8 +38,6 @@ class SwitchBotAPI:
             ).digest()
         ).decode()
 
-        #print(timestamp)
-
         return {
             'Authorization': self.token,
             'Content-Type': 'application/json',
@@ -49,22 +46,6 @@ class SwitchBotAPI:
             'sign': signature,
             'nonce': str(nonce)
         }
-
-    def generate_curl_bat(self, output_file="switchbot_request.bat"):
-        curl_command = (
-            f'curl -X GET "{self.switchbot_hostname}" '
-            f'-H "Authorization: {self.header["Authorization"]}" '
-            f'-H "Content-Type: {self.header["Content-Type"]}" '
-            f'-H "charset: {self.header["charset"]}" '
-            f'-H "t: {self.header["t"]}" '
-            f'-H "sign: {self.header["sign"]}" '
-            f'-H "nonce: {self.header["nonce"]}"'
-        )
-
-        with open(output_file, "w", encoding="utf-8") as file:
-            file.write(f'@echo off\n{curl_command}\n')
-
-        print(f"バッチファイル {output_file} を生成しました。")
 
     def get_devices(self):
         url = self.switchbot_hostname
@@ -81,6 +62,7 @@ class SwitchBotAPI:
             "parameter": 'default',
         }
         response = requests.post(url, headers=self.header, json=payload)
+
         if response.status_code == 200:
             return response.json()
         else:

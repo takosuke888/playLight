@@ -3,3 +3,4 @@
 /static/pokemon
 /__pycache__/*
 *.bat
+*.log
