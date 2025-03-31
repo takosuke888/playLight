@@ -27,11 +27,15 @@ color_dict = {
     "orange.png": "255:50:0",
     "red.png": "255:0:0",
     "yellow.png": "255:255:0",
+    "peach.png": "255:200:150",
+    "nasu.png": "255:0:255",
 
     "ashimari.png": "0:0:255",
     "hogeta.png": "255:0:0",
     "pikachu.png": "255:255:0",
-    "sarunori.png": "50:200:10"
+    "sarunori.png": "50:200:10",
+    "meripu.png": "255:255:100",
+    "evee.png": "255:200:150",
 }
 
 swithLED = switchbot_led_test.SwitchBotAPI()
