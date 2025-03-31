@@ -23,19 +23,19 @@ ICON_DIRS = ["static/pokemon", "static/icons"]
 color_dict = {
     "blue.png": "0:0:255",
     "green.png": "0:255:0",
-    "lightblue.png": "0:255:255",
+    "lightblue.png": "0:200:255",
     "orange.png": "255:50:0",
     "red.png": "255:0:0",
-    "yellow.png": "255:255:0",
-    "peach.png": "255:200:150",
-    "nasu.png": "255:0:255",
+    "yellow.png": "255:200:0",
+    "peach.png": "255:0:150",
+    "nasu.png": "200:0:255",
 
     "ashimari.png": "0:0:255",
     "hogeta.png": "255:0:0",
-    "pikachu.png": "255:255:0",
+    "pikachu.png": "255:200:0",
     "sarunori.png": "50:200:10",
-    "meripu.png": "255:255:100",
-    "evee.png": "255:200:150",
+    "meripu.png": "255:100:50",
+    "evee.png": "255:50:0",
 }
 
 swithLED = switchbot_led_test.SwitchBotAPI()
