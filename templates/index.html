@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="jp">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -45,6 +45,17 @@
         .shake {
             animation: shake 1s;
         }
+        /* 回転アニメーション */
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* ズームインアウトアニメーション */
+        @keyframes zoom-in-out {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+            100% { transform: scale(1); }
+        }
 
         /* 更新ボタンのスタイル */
         .refresh-button {
@@ -65,7 +76,7 @@
 </head>
 <body>
     <!-- 更新ボタン -->
-    <div class="refresh-button" onclick="location.reload();">
+    <div class="refresh-button" onclick="location.reload();" ontouchstart="location.reload();">
         <img src="{{ url_for('static', filename='reflesh.png') }}" alt="Refresh">
     </div>
 
@@ -90,22 +101,46 @@
 
         let isAnimating = false; // アニメーション進行中かどうかを管理するフラグ
 
+        // 30sごとにページをリロードする
+        setInterval(() => {
+            location.reload();
+        }, 30000); // 30秒ごとにリロード
+
+
         // タッチイベントでの画像クリック処理
         async function imageClick(element, imageName) {
             
             if (isAnimating) return; // アニメーション中はイベントを無効化
 
-            isAnimating = true; // アニメーション進行中に設定            
+            isAnimating = true; // アニメーション進行中に設定
             
-            // アイコンをシェイク
-            element.classList.add('shake');
+            // ランダムで回転またはシェイク
 
-            // 1秒後にシェイク効果を削除
-            setTimeout(() => {
-                element.classList.remove('shake');
-                isAnimating = false; // アニメーション終了後にフラグを解除
-            }, 1000);
-
+            const randomNum = Math.random();
+            if (randomNum < 0.3) {
+                // 回転アニメーションを追加
+                element.style.animation = 'rotate 1s linear';
+                setTimeout(() => {
+                    element.style.animation = ''; // アニメーションをリセット
+                    isAnimating = false; // アニメーション終了
+                }, 1000);
+            } else if (randomNum < 0.6) {
+                // シェイクアニメーションを追加
+                element.classList.add('shake');
+                setTimeout(() => {
+                    element.classList.remove('shake'); // アニメーションをリセット
+                    isAnimating = false; // アニメーション終了
+                }, 1000);
+            }
+            else {
+                // ズームインアウトアニメーションを追加
+                element.style.animation = 'zoom-in-out 1s ease-in-out';
+                setTimeout(() => {
+                    element.style.animation = ''; // アニメーションをリセット
+                    isAnimating = false; // アニメーション終了
+                }, 1000);
+            }
+            
             // サーバーへリクエスト送信
             try {
                 await fetch('/light_control', {

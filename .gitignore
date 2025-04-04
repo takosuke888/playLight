@@ -1,6 +1,7 @@
 *.json
 /static/icons*
 /static/pokemon
+/static/anpan
 /__pycache__/*
 *.bat
 *.log

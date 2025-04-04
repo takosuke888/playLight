@@ -18,7 +18,7 @@ app = Flask(__name__)
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
 # アイコン画像のディレクトリを指定
-ICON_DIRS = ["static/pokemon", "static/icons"]
+ICON_DIRS = ["static/pokemon", "static/icons", "static/anpan"]
 
 color_dict = {
     "blue.png": "0:0:255",
@@ -36,6 +36,15 @@ color_dict = {
     "sarunori.png": "50:200:10",
     "meripu.png": "255:100:50",
     "evee.png": "255:50:0",
+
+    "anpan.png": "255:0:0",
+    "baikin.png": "200:0:255",
+    "cheeze.png": "255:50:0",
+    "dokin.png": "255:50:0",
+    "kare.png": "255:50:50",
+    "kokin.png": "10:10:255",
+    "meron.png": "255:200:0",
+    "shoku.png": "255:255:255"
 }
 
 swithLED = switchbot_led_test.SwitchBotAPI()
@@ -69,7 +78,7 @@ def add_color_dict(image_path):
 @app.route('/')
 def index():
 
-    icon_dir = ICON_DIRS[random.randint(0,1)]
+    icon_dir = ICON_DIRS[random.randint(0,len(ICON_DIRS)-1)]
 
     # 画像ディレクトリからファイル名を取得
     all_images = [f for f in os.listdir(icon_dir) if f.endswith(('.png', '.jpg', '.jpeg', '.gif'))]
@@ -85,9 +94,13 @@ def index():
     # 中心画像
     center_image = "light.jpg"
 
-    # APIヘッダーの初期化
-    swithLED.header = swithLED.create_header()
-    logger.info(f"Event: create_header, Header: {swithLED.header}")
+    # 前回のヘッダー作成から5分経過している場合、ヘッダーを再作成
+    if (time.time() - swithLED.header_created_at) > 300:
+        swithLED.header = swithLED.create_header()
+        swithLED.header_created_at = time.time()
+        logger.info(f"Event: create_header, Header: {swithLED.header}")
+    else:
+        print("Header is still valid.")
 
     return render_template('index.html', center_image=center_image, images=selected_images_paths)
 
@@ -99,7 +112,8 @@ def change_light_color():
     image_name = image_path.split('/')[-1]
 
     if image_name == 'light.jpg':
-        swithLED.turn_on(swithLED.bulb_device_id)
+        #swithLED.turn_on(swithLED.bulb_device_id)
+        swithLED.toggle(swithLED.bulb_device_id)
         time.sleep(1)
         swithLED.set_cct(swithLED.bulb_device_id, 5200)
         time.sleep(3)

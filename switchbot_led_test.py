@@ -26,6 +26,10 @@ class SwitchBotAPI:
         self.bulb_device_id = self.get_deviceID_by_name(device_name)
 
     def create_header(self):
+
+        # headerを作成した日時を保持
+        self.header_created_at = time.time()
+
         nonce = uuid.uuid4()
         timestamp = int(round(time.time() * 1000))
         string_to_sign = f'{self.token}{timestamp}{nonce}'
@@ -72,6 +76,19 @@ class SwitchBotAPI:
         url = f'{self.switchbot_hostname}/{device_id}/commands'
         payload = {
             'command': 'turnOff', 
+            "parameter": 'default',
+        }
+        response = requests.post(url, headers=self.header, json=payload)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return f"Error: {response.status_code}, {response.json()}"
+        
+    # トグル
+    def toggle(self, device_id: str):
+        url = f'{self.switchbot_hostname}/{device_id}/commands'
+        payload = {
+            'command': 'toggle', 
             "parameter": 'default',
         }
         response = requests.post(url, headers=self.header, json=payload)
