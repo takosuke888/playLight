@@ -114,8 +114,6 @@ def change_light_color():
     if image_name == 'light.jpg':
         #swithLED.turn_on(swithLED.bulb_device_id)
         swithLED.toggle(swithLED.bulb_device_id)
-        time.sleep(1)
-        swithLED.set_cct(swithLED.bulb_device_id, 5200)
         time.sleep(3)
         logger.info(f"Event: turn_on, DeviceID: {swithLED.bulb_device_id}")
         return '', 204
