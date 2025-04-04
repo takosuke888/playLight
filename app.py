@@ -94,7 +94,7 @@ def index():
     # 中心画像
     center_image = "light.jpg"
 
-    # 前回のヘッダー作成から2分経過している場合、ヘッダーを再作成
+    # 前回のヘッダー作成から3分経過している場合、ヘッダーを再作成
     if (time.time() - swithLED.header_created_at) > 180:
         swithLED.header = swithLED.create_header()
         swithLED.header_created_at = time.time()
