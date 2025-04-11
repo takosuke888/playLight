@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>統計グラフ</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        canvas {
+            max-width: 800px;
+            height: 400px; /* 高さを明示的に指定 */
+            margin: 30px auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h2>イベント数（日別）</h2>
+    <canvas id="lineChart"></canvas>
+
+    <h2>人気コンテンツ</h2>
+    <canvas id="pieChart"></canvas>
+
+    <script>
+        // Flaskから渡されたJSONデータをパース
+        const stats = JSON.parse('{{ stats|safe }}');
+
+        // 折れ線グラフ用データ（日別）
+        const dayLabels = Object.keys(stats.evens_per_day);
+        const dayValues = Object.values(stats.evens_per_day);
+
+        // 円グラフ用データ（画像別）
+        const imageLabels = Object.keys(stats.evens_per_image);
+        const imageValues = Object.values(stats.evens_per_image);
+
+        // 折れ線グラフ
+        new Chart(document.getElementById('lineChart'), {
+            type: 'line',
+            data: {
+                labels: dayLabels,
+                datasets: [{
+                    label: 'イベント数',
+                    data: dayValues,
+                    fill: false,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.4)',
+                    tension: 0.2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // 円グラフ
+        new Chart(document.getElementById('pieChart'), {
+            type: 'pie',
+            data: {
+                labels: imageLabels,
+                datasets: [{
+                    label: '画像ごとのイベント数',
+                    data: imageValues,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(255, 206, 86, 0.6)',
+                        'rgba(75, 192, 192, 0.6)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    </script>
+</body>
+</html>

@@ -5,6 +5,7 @@ import switchbot_led_test
 import cv2
 from sklearn.cluster import KMeans
 import time
+import json
 
 import logging
 
@@ -130,9 +131,70 @@ def change_light_color():
 
         response = swithLED.set_color(swithLED.bulb_device_id, color)
         time.sleep(3)
-        logger.info(f"Event: set_color, DeviceID: {swithLED.bulb_device_id}, 色: {color}")
+        logger.info(f"Event: set_color, DeviceID: {swithLED.bulb_device_id}, Color: {color}, Image: {image_name}")
 
         return '', 204  # レスポンスボディなし、ステータスコード204で終了
 
+# ログデータを取得するエンドポイント
+# json形式で返す
+@app.route('/log', methods=['GET'])
+def get_log_data():
+    try:
+        with open('event_log.log', 'r', encoding='utf-8') as f:
+            logs = f.readlines()
+
+        # 改行を削除
+        logs = [log.strip() for log in logs]
+
+        return {'logs': logs}, 200
+    except FileNotFoundError:
+        return {'error': 'Log file not found.'}, 404
+
+# 統計データを取得するエンドポイント
+# json形式で返す
+@app.route('/stats', methods=['GET'])
+def get_stats_data():
+    try:
+        with open('event_log.log', 'r', encoding='utf-8') as f:
+            logs = f.readlines()
+
+        # 改行を削除
+        logs = [log.strip() for log in logs]
+
+        # 'set_color'を含むログのみを抽出
+        logs = [log for log in logs if 'set_color' in log]
+
+        # タイムスタンプと内容を分離
+        logs_1 = [{'timestamp': log.split(' - ')[0], 'image': log.split('Image: ')[-1]} for log in logs]
+
+        # 統計データを保持する辞書
+        stats = {
+            'total_events': len(logs),
+            'evens_per_day': {},
+            'evens_per_image': {}
+        }
+
+        # 日付ごとのイベントの数をカウントし、evens_per_dayに追加
+        for log in logs_1:
+            date = log['timestamp'].split(' ')[0]
+            if date not in stats['evens_per_day']:
+                stats['evens_per_day'][date] = 0
+            stats['evens_per_day'][date] += 1
+
+        # 'Image'を含むログのみを抽出
+        logs = [log for log in logs if 'Image' in log]
+        logs_2 = [{'timestamp': log.split(' - ')[0], 'image': log.split('Image: ')[-1]} for log in logs]
+
+        # イメージごとのイベントの数をカウントし、evens_per_imageに追加
+        for log in logs_2:
+            image = log['image']
+            if image not in stats['evens_per_image']:
+                stats['evens_per_image'][image] = 0
+            stats['evens_per_image'][image] += 1
+
+        return render_template("stats.html", stats=json.dumps(stats))
+    except FileNotFoundError:
+        return {'error': 'Log file not found.'}, 404
+    
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

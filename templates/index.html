@@ -96,7 +96,8 @@
                 data-image="{{ images[3] }}">
         </div>
     </div>
-
+    <!-- /statsへのリンク-->
+    <a href="/stats" style="position: absolute; top: 10px; left: 10px; z-index: 1000;">Stats</a>
     <script>
 
         let isAnimating = false; // アニメーション進行中かどうかを管理するフラグ
@@ -104,7 +105,7 @@
         // 30sごとにページをリロードする
         setInterval(() => {
             location.reload();
-        }, 30000); // 30秒ごとにリロード
+        }, 15000); // 15秒ごとにリロード
 
 
         // タッチイベントでの画像クリック処理
