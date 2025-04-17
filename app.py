@@ -146,6 +146,9 @@ def get_log_data():
         # 改行を削除
         logs = [log.strip() for log in logs]
 
+        # 最新50件のログを取得
+        logs = logs[-50:]
+
         return {'logs': logs}, 200
     except FileNotFoundError:
         return {'error': 'Log file not found.'}, 404

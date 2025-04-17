@@ -32,6 +32,21 @@
         const imageLabels = Object.keys(stats.evens_per_image);
         const imageValues = Object.values(stats.evens_per_image);
 
+        // ラベルと値を一緒にしてソート
+        const combined = imageLabels.map((label, i) => ({ label, value: imageValues[i] }));
+        combined.sort((a, b) => b.value - a.value);
+
+        // 上位10個とそれ以外に分割
+        const top10 = combined.slice(0, 10);
+        const others = combined.slice(10);
+
+        // 「その他」の合計値を計算
+        const othersTotal = others.reduce((sum, item) => sum + item.value, 0);
+
+        // グラフ用データに変換
+        const finalLabels = top10.map(item => item.label).concat('その他');
+        const finalValues = top10.map(item => item.value).concat(othersTotal);
+
         // 折れ線グラフ
         new Chart(document.getElementById('lineChart'), {
             type: 'line',
@@ -56,18 +71,26 @@
             }
         });
 
-        // 円グラフ
+        // グラフ描画
         new Chart(document.getElementById('pieChart'), {
             type: 'pie',
             data: {
-                labels: imageLabels,
+                labels: finalLabels,
                 datasets: [{
                     label: '画像ごとのイベント数',
-                    data: imageValues,
+                    data: finalValues,
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.6)',
-                        'rgba(255, 206, 86, 0.6)',
-                        'rgba(75, 192, 192, 0.6)'
+                        'rgba(255, 159, 64, 0.6)',
+                        'rgba(255, 205, 86, 0.6)',
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(153, 102, 255, 0.6)',
+                        'rgba(201, 203, 207, 0.6)',
+                        'rgba(255, 99, 71, 0.6)',
+                        'rgba(100, 149, 237, 0.6)',
+                        'rgba(60, 179, 113, 0.6)',
+                        'rgba(169, 169, 169, 0.6)' // その他
                     ]
                 }]
             },
