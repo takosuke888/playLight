@@ -7,45 +7,135 @@
     <style>
         canvas {
             max-width: 800px;
-            height: 400px; /* 高さを明示的に指定 */
+            height: 400px;
             margin: 30px auto;
             display: block;
+        }
+        h2 {
+            font-family: sans-serif;
+            text-align: center;      /* 中央寄せ */
+            font-size: 32px;         /* フォントサイズの指定（例：24px） */
+            margin-top: 10%;
+        }
+        .stats-topic {
+            display: flex;
+            align-items: center;
+            justify-content: center; /* ←これで子要素を中央に寄せる */
+            margin-bottom: 5px;
+        }
+        .container {  /* 親ラッパー div を想定 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto; /* 上下の余白を追加 */
+        }
+        .stats-topic img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .stats-title {
+            flex: 1;
+            font-size: 32px;
+            font-family: sans-serif;
+            font-weight: bold;
+            text-align: center; /* 中央寄せ */
+            margin-top: 20px; /* 上の余白を追加 */
+        }
+        .ranking-list {
+            max-width: 800px;
+            margin: 20px auto;
+            font-family: sans-serif;
+            font-size: 32px;
+        }
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .rank-number {
+            width: 30px;
+            text-align: right;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .color-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .item-name {
+            flex: 1;
+        }
+        .item-value {
+            width: 60px;
+            text-align: right;
+        }
+        .image-icon {
+            width: 60px;
+            height: 45px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 10px;
         }
     </style>
 </head>
 <body>
+
+    <a href="/" style="position: absolute; top: 10px; left: 10px; z-index: 1000;">Home</a>
+    <a href="/log" style="position: absolute; top: 30px; left: 10px; z-index: 1000;">Logs</a>
+    
     <h2>イベント数（日別）</h2>
     <canvas id="lineChart"></canvas>
 
-    <h2>人気コンテンツ</h2>
+    <!-- ランキングのアイコンを表示-->
+    <div class="container">
+        <div class="stats-topic">
+            <img src="/static/ranking.png" alt="Ranking Icon"/>
+            <div class="stats-title">人気コンテンツ</div>
+        </div>
+    </div>
     <canvas id="pieChart"></canvas>
 
-    <script>
-        // Flaskから渡されたJSONデータをパース
-        const stats = JSON.parse('{{ stats|safe }}');
+    <div class="ranking-list" id="rankingList"></div>
 
-        // 折れ線グラフ用データ（日別）
+    <script>
+        const stats = JSON.parse('{{ stats|safe }}');
+        const iconDirs = JSON.parse('{{ icon_dirs|safe }}');
+
         const dayLabels = Object.keys(stats.evens_per_day);
         const dayValues = Object.values(stats.evens_per_day);
 
-        // 円グラフ用データ（画像別）
         const imageLabels = Object.keys(stats.evens_per_image);
         const imageValues = Object.values(stats.evens_per_image);
 
-        // ラベルと値を一緒にしてソート
         const combined = imageLabels.map((label, i) => ({ label, value: imageValues[i] }));
         combined.sort((a, b) => b.value - a.value);
 
-        // 上位10個とそれ以外に分割
-        const top10 = combined.slice(0, 10);
-        const others = combined.slice(10);
-
-        // 「その他」の合計値を計算
+        const top15 = combined.slice(0, 15);
+        const others = combined.slice(15);
         const othersTotal = others.reduce((sum, item) => sum + item.value, 0);
 
-        // グラフ用データに変換
-        const finalLabels = top10.map(item => item.label).concat('その他');
-        const finalValues = top10.map(item => item.value).concat(othersTotal);
+        const finalLabels = top15.map(item => item.label).concat('その他');
+        const finalValues = top15.map(item => item.value).concat(othersTotal);
+
+        const backgroundColors = [
+            'rgba(255, 99, 132, 0.6)',
+            'rgba(255, 159, 64, 0.6)',
+            'rgba(255, 205, 86, 0.6)',
+            'rgba(75, 192, 192, 0.6)',
+            'rgba(54, 162, 235, 0.6)',
+            'rgba(153, 102, 255, 0.6)',
+            'rgba(201, 203, 207, 0.6)',
+            'rgba(255, 99, 71, 0.6)',
+            'rgba(100, 149, 237, 0.6)',
+            'rgba(60, 179, 113, 0.6)',
+            'rgba(169, 169, 169, 0.6)' // その他
+        ];
 
         // 折れ線グラフ
         new Chart(document.getElementById('lineChart'), {
@@ -71,32 +161,47 @@
             }
         });
 
-        // グラフ描画
+        // ドーナツグラフ
         new Chart(document.getElementById('pieChart'), {
-            type: 'pie',
+            type: 'doughnut', // 'pie' を 'doughnut' に変更
             data: {
                 labels: finalLabels,
                 datasets: [{
                     label: '画像ごとのイベント数',
                     data: finalValues,
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.6)',
-                        'rgba(255, 159, 64, 0.6)',
-                        'rgba(255, 205, 86, 0.6)',
-                        'rgba(75, 192, 192, 0.6)',
-                        'rgba(54, 162, 235, 0.6)',
-                        'rgba(153, 102, 255, 0.6)',
-                        'rgba(201, 203, 207, 0.6)',
-                        'rgba(255, 99, 71, 0.6)',
-                        'rgba(100, 149, 237, 0.6)',
-                        'rgba(60, 179, 113, 0.6)',
-                        'rgba(169, 169, 169, 0.6)' // その他
-                    ]
+                    backgroundColor: backgroundColors
                 }]
             },
             options: {
-                responsive: true
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false // 凡例を非表示にする
+                    }
+                }
             }
+        });
+
+
+        // ランキング表示
+        const total = top15.reduce((sum, item) => sum + item.value, 0) + othersTotal;
+        const rankingList = document.getElementById('rankingList');
+        top15.forEach((item, index) => {
+            const percentage = ((item.value / total) * 100).toFixed(1) + '%';
+            const color = backgroundColors[index];
+            // item.labelがiconDirsのバリューのリストに含まれる場合、keyを取得
+            const iconDir = Object.keys(iconDirs).find(key => iconDirs[key].includes(item.label));
+            const imageUrl = `/${iconDir}/${item.label}`;  // ファイル名はラベル名と一致している前提
+            const div = document.createElement('div');
+            div.className = 'ranking-item';
+            div.innerHTML = `
+                <div class="rank-number">${index + 1}</div>
+                <span class="color-dot" style="background-color:${color}"></span>
+                <img src="${imageUrl}" class="image-icon" alt="${item.label}">
+                <div class="item-name">${item.label}</div>
+                <div class="item-value">${percentage}</div>
+            `;
+            rankingList.appendChild(div);
         });
     </script>
 </body>

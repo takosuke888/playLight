@@ -20,6 +20,13 @@ logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
 # アイコン画像のディレクトリを指定
 ICON_DIRS = ["static/pokemon", "static/icons", "static/anpan"]
+ICON_NAME_DICT = {
+    'static/pokemon': [],
+    'static/icons': [],
+    'static/anpan': []
+}
+for icion_dir in ICON_NAME_DICT.keys():
+    ICON_NAME_DICT[icion_dir] = [f for f in os.listdir(icion_dir) if f.endswith(('.png', '.jpg', '.jpeg', '.gif'))]
 
 color_dict = {
     "blue.png": "0:0:255",
@@ -195,7 +202,7 @@ def get_stats_data():
                 stats['evens_per_image'][image] = 0
             stats['evens_per_image'][image] += 1
 
-        return render_template("stats.html", stats=json.dumps(stats))
+        return render_template("stats.html", stats=json.dumps(stats), icon_dirs=json.dumps(ICON_NAME_DICT))
     except FileNotFoundError:
         return {'error': 'Log file not found.'}, 404
     
