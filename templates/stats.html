@@ -5,6 +5,12 @@
     <title>統計グラフ</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+        }
         canvas {
             max-width: 800px;
             height: 400px;
@@ -48,7 +54,7 @@
             max-width: 800px;
             margin: 20px auto;
             font-family: sans-serif;
-            font-size: 32px;
+            font-size: 42px;
         }
         .ranking-item {
             display: flex;
@@ -72,7 +78,6 @@
             flex: 1;
         }
         .item-value {
-            width: 60px;
             text-align: right;
         }
         .image-icon {
@@ -106,6 +111,7 @@
     <script>
         const stats = JSON.parse('{{ stats|safe }}');
         const iconDirs = JSON.parse('{{ icon_dirs|safe }}');
+        const colorDict = JSON.parse('{{ color_dict|safe }}');
 
         const dayLabels = Object.keys(stats.evens_per_day);
         const dayValues = Object.values(stats.evens_per_day);
@@ -123,20 +129,20 @@
         const finalLabels = top15.map(item => item.label).concat('その他');
         const finalValues = top15.map(item => item.value).concat(othersTotal);
 
-        const backgroundColors = [
-            'rgba(255, 99, 132, 0.6)',
-            'rgba(255, 159, 64, 0.6)',
-            'rgba(255, 205, 86, 0.6)',
-            'rgba(75, 192, 192, 0.6)',
-            'rgba(54, 162, 235, 0.6)',
-            'rgba(153, 102, 255, 0.6)',
-            'rgba(201, 203, 207, 0.6)',
-            'rgba(255, 99, 71, 0.6)',
-            'rgba(100, 149, 237, 0.6)',
-            'rgba(60, 179, 113, 0.6)',
-            'rgba(169, 169, 169, 0.6)' // その他
-        ];
-
+        // colorDictを使から、top15のラベル名称に対応する色を取得
+        // dictには{"blue.png": "0:0:255"}のような形で格納されている
+        // 16項目目には"その他"として、rgba(169, 169, 169, 0.6)を指定
+        const backgroundColors = top15.map(item => {
+            const color = colorDict[item.label];
+            // 0:0:255 のような形式から、rgba(0, 0, 255, 0.6)に変換
+            if (color) {
+                const rgb = color.split(':').map(Number);
+                return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.4)`; // 透明度を0.6に設定
+            } else {
+                return 'rgba(169, 169, 169, 0.6)'; // その他の色
+            }
+        });
+        backgroundColors.push('rgba(169, 169, 169, 0.6)'); // その他の色
         // 折れ線グラフ
         new Chart(document.getElementById('lineChart'), {
             type: 'line',
@@ -186,8 +192,9 @@
         // ランキング表示
         const total = top15.reduce((sum, item) => sum + item.value, 0) + othersTotal;
         const rankingList = document.getElementById('rankingList');
-        top15.forEach((item, index) => {
-            const percentage = ((item.value / total) * 100).toFixed(1) + '%';
+        const top10 = top15.slice(0, 10); // 上位10項目を取得
+        top10.forEach((item, index) => {
+            const percentage = item.value+ '回';
             const color = backgroundColors[index];
             // item.labelがiconDirsのバリューのリストに含まれる場合、keyを取得
             const iconDir = Object.keys(iconDirs).find(key => iconDirs[key].includes(item.label));

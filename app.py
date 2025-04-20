@@ -202,7 +202,7 @@ def get_stats_data():
                 stats['evens_per_image'][image] = 0
             stats['evens_per_image'][image] += 1
 
-        return render_template("stats.html", stats=json.dumps(stats), icon_dirs=json.dumps(ICON_NAME_DICT))
+        return render_template("stats.html", stats=json.dumps(stats), icon_dirs=json.dumps(ICON_NAME_DICT), color_dict=json.dumps(color_dict))
     except FileNotFoundError:
         return {'error': 'Log file not found.'}, 404
     
