@@ -107,6 +107,7 @@ def index():
         swithLED.header = swithLED.create_header()
         swithLED.header_created_at = time.time()
         logger.info(f"Event: create_header, Header: {swithLED.header}")
+        logger.info(f"Event: get_devices, Devices: {swithLED.devices}")
     else:
         print("Header is still valid.")
 

@@ -22,6 +22,8 @@ class SwitchBotAPI:
         self.secret = setting['secret']
         self.header = self.create_header()
 
+        self.devices = None
+
         device_name = "ダイニング"
         self.bulb_device_id = self.get_deviceID_by_name(device_name)
 
@@ -123,6 +125,7 @@ class SwitchBotAPI:
 
     def get_deviceID_by_name(self, name: str):
         devices = self.get_devices()
+        self.devices = devices
         print(devices)
         if isinstance(devices, dict) and 'body' in devices and 'deviceList' in devices['body']:
             for device in devices['body']['deviceList']:
