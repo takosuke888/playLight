@@ -107,6 +107,12 @@ def index():
         swithLED.header = swithLED.create_header()
         swithLED.header_created_at = time.time()
         logger.info(f"Event: create_header, Header: {swithLED.header}")
+
+        swithLED.devices = swithLED.get_devices()
+        swithLED.bulb_device_id = swithLED.get_deviceID_by_name("ダイニング")
+        swithLED.tape_device_id = swithLED.get_deviceID_by_name("テープライト")
+        print(swithLED.bulb_device_id, swithLED.tape_device_id)
+
         logger.info(f"Event: get_devices, Devices: {swithLED.devices}")
     else:
         print("Header is still valid.")
@@ -124,8 +130,40 @@ def change_light_color():
         #swithLED.turn_on(swithLED.bulb_device_id)
         swithLED.toggle(swithLED.bulb_device_id)
         time.sleep(3)
-        logger.info(f"Event: turn_on, DeviceID: {swithLED.bulb_device_id}")
+        logger.info(f"Event: toggle, DeviceID: {swithLED.bulb_device_id}")
+
+        swithLED.bulb_is_on = True
+
         return '', 204
+    
+    elif image_name == 'switch.png':
+
+        if swithLED.bulb_is_on:
+            response = swithLED.turn_off(swithLED.bulb_device_id)
+            time.sleep(0.5)
+        
+            response = swithLED.set_color(swithLED.tape_device_id, swithLED.last_color)
+            logger.info(f"Event: Switch to tape, DeviceID: {swithLED.tape_device_id}, Color: {swithLED.last_color}, Image: {image_name}")
+
+            swithLED.tape_is_on = True
+            swithLED.bulb_is_on = False
+
+            return '', 204
+
+        else:
+            response = swithLED.turn_off(swithLED.tape_device_id)
+            print(response)
+            time.sleep(0.5)
+        
+            response = swithLED.set_color(swithLED.bulb_device_id, swithLED.last_color)
+            time.sleep(3)
+            logger.info(f"Event: Switch to bulb, DeviceID: {swithLED.bulb_device_id}, Color: {swithLED.last_color}, Image: {image_name}")
+
+            swithLED.tape_is_on = False
+            swithLED.bulb_is_on = True
+
+            return '', 204
+
     else:
 
         # デバイスIDが見つからない場合の処理
@@ -136,6 +174,13 @@ def change_light_color():
             color = color_dict[image_name]
         else:
             return "Color not found", 404
+        
+        if swithLED.tape_is_on:
+            swithLED.turn_off(swithLED.tape_device_id)
+            swithLED.tape_is_on = False
+            time.sleep(0.5)
+        
+        swithLED.bulb_is_on = True
 
         response = swithLED.set_color(swithLED.bulb_device_id, color)
         time.sleep(3)
@@ -179,6 +224,7 @@ def get_stats_data():
         logs_1 = [{'timestamp': log.split(' - ')[0], 'image': log.split('Image: ')[-1]} for log in logs]
 
         # 統計データを保持する辞書
+
         stats = {
             'total_events': len(logs),
             'evens_per_day': {},

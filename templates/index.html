@@ -72,6 +72,22 @@
             width: 100%;
             height: 100%;
         }
+
+        /* スイッチボタンのスタイル */
+        .switch-button {
+            position: fixed;
+            top: 80px;
+            right: 5px;
+            width: 80px;
+            height: 80px;
+            cursor: pointer;
+            z-index: 1000; /* 最前面に配置 */
+        }
+
+        .switch-button img {
+            width: 80%;
+            height: 80%;
+        }
     </style>
 </head>
 <body>
@@ -80,20 +96,20 @@
         <img src="{{ url_for('static', filename='reflesh.png') }}" alt="Refresh">
     </div>
 
+    <!-- スイッチボタン -->>
+    <div class="switch-button">
+        <img src="{{ url_for('static', filename='switch.png') }}" alt="Switch" image-name="switch.png">
+    </div>
+
     <div class="container">
         <div class="center-image">
-            <img src="{{ url_for('static', filename='' + center_image) }}" alt="Center Image"
-                id="center-image">
+            <img src="{{ url_for('static', filename=center_image) }}" alt="Center Image" id="center-image" image-name="{{center_image}}">
         </div>
         <div class="grid">
-            <img src="{{ url_for('static', filename=images[0]) }}" alt="Image 1" 
-                data-image="{{ images[0] }}">
-            <img src="{{ url_for('static', filename=images[1]) }}" alt="Image 2" 
-                data-image="{{ images[1] }}">
-            <img src="{{ url_for('static', filename=images[2]) }}" alt="Image 3" 
-                data-image="{{ images[2] }}">
-            <img src="{{ url_for('static', filename=images[3]) }}" alt="Image 4" 
-                data-image="{{ images[3] }}">
+            <img src="{{ url_for('static', filename=images[0]) }}" alt="Image 1" image-name="{{ images[0] }}">
+            <img src="{{ url_for('static', filename=images[1]) }}" alt="Image 2" image-name="{{ images[1] }}">
+            <img src="{{ url_for('static', filename=images[2]) }}" alt="Image 3" image-name="{{ images[2] }}">
+            <img src="{{ url_for('static', filename=images[3]) }}" alt="Image 4" image-name="{{ images[3] }}">
         </div>
     </div>
     <!-- /statsへのリンク-->
@@ -159,9 +175,9 @@
 
         // クリック/タッチイベントリスナーの登録
         function setupEventListeners() {
-            const images = document.querySelectorAll('.grid img, .center-image img');
+            const images = document.querySelectorAll('.grid img, .center-image img, .switch-button img');
             images.forEach(image => {
-                const imageName = image.getAttribute('data-image') || 'light.jpg';
+                const imageName = image.getAttribute('image-name') || 'light.jpg';
 
                 // クリックおよびタッチイベントを追加
                 image.addEventListener('touchstart', (event) => {

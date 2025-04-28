@@ -22,10 +22,15 @@ class SwitchBotAPI:
         self.secret = setting['secret']
         self.header = self.create_header()
 
-        self.devices = None
+        # デバイス情報を取得
+        self.devices = self.get_devices()
+        self.bulb_device_id = self.get_deviceID_by_name("ダイニング")
+        self.tape_device_id = self.get_deviceID_by_name("テープライト")
+        print(self.bulb_device_id, self.tape_device_id)
 
-        device_name = "ダイニング"
-        self.bulb_device_id = self.get_deviceID_by_name(device_name)
+        self.last_color = None
+        self.bulb_is_on = False
+        self.tape_is_on = False
 
     def create_header(self):
 
@@ -78,7 +83,7 @@ class SwitchBotAPI:
         url = f'{self.switchbot_hostname}/{device_id}/commands'
         payload = {
             'command': 'turnOff', 
-            "parameter": 'default',
+            "parameter": 'default'
         }
         response = requests.post(url, headers=self.header, json=payload)
         if response.status_code == 200:
@@ -103,10 +108,11 @@ class SwitchBotAPI:
         url = f'{self.switchbot_hostname}/{device_id}/commands'
         payload = {
             'command': 'setColor', 
-            "parameter": color,
+            "parameter": color
         }
         response = requests.post(url, headers=self.header, json=payload)
         if response.status_code == 200:
+            self.last_color = color
             return response.json()
         else:
             return f"Error: {response.status_code}, {response.json()}"
@@ -124,15 +130,12 @@ class SwitchBotAPI:
             return f"Error: {response.status_code}, {response.json()}"
 
     def get_deviceID_by_name(self, name: str):
-        devices = self.get_devices()
-        self.devices = devices
-        print(devices)
-        if isinstance(devices, dict) and 'body' in devices and 'deviceList' in devices['body']:
-            for device in devices['body']['deviceList']:
+        if isinstance(self.devices, dict) and 'body' in self.devices and 'deviceList' in self.devices['body']:
+            for device in self.devices['body']['deviceList']:
                 if device['deviceName'] == name:
                     return device['deviceId']
         return None
-    
+
     def get_device_status(self, deviceId: str):
         url = f'{self.switchbot_hostname}/{deviceId}/status'
         response = requests.get(url, headers=self.header)
