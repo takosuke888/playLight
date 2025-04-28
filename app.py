@@ -19,7 +19,7 @@ app = Flask(__name__)
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
 # アイコン画像のディレクトリを指定
-ICON_DIRS = ["static/pokemon", "static/icons", "static/anpan"]
+ICON_DIRS = ['static/pokemon', 'static/icons', 'static/anpan']
 ICON_NAME_DICT = {
     'static/pokemon': [],
     'static/icons': [],
@@ -29,30 +29,30 @@ for icion_dir in ICON_NAME_DICT.keys():
     ICON_NAME_DICT[icion_dir] = [f for f in os.listdir(icion_dir) if f.endswith(('.png', '.jpg', '.jpeg', '.gif'))]
 
 color_dict = {
-    "blue.png": "0:0:255",
-    "green.png": "0:255:0",
-    "lightblue.png": "0:200:255",
-    "orange.png": "255:50:0",
-    "red.png": "255:0:0",
-    "yellow.png": "255:200:0",
-    "peach.png": "255:0:150",
-    "nasu.png": "200:0:255",
+    'blue.png': '0:0:255',
+    'green.png': '0:255:0',
+    'lightblue.png': '0:200:255',
+    'orange.png': '255:50:0',
+    'red.png': '255:0:0',
+    'yellow.png': '255:200:0',
+    'peach.png': '255:0:150',
+    'nasu.png': '200:0:255',
 
-    "ashimari.png": "0:0:255",
-    "hogeta.png": "255:0:0",
-    "pikachu.png": "255:200:0",
-    "sarunori.png": "50:200:10",
-    "meripu.png": "255:100:50",
-    "evee.png": "255:50:0",
+    'ashimari.png': '0:0:255',
+    'hogeta.png': '255:0:0',
+    'pikachu.png': '255:200:0',
+    'sarunori.png': '50:200:10',
+    'meripu.png': '255:100:50',
+    'evee.png': '255:50:0',
 
-    "anpan.png": "255:0:0",
-    "baikin.png": "200:0:255",
-    "cheeze.png": "255:50:0",
-    "dokin.png": "255:50:0",
-    "kare.png": "255:50:50",
-    "kokin.png": "10:10:255",
-    "meron.png": "255:200:0",
-    "shoku.png": "255:255:255"
+    'anpan.png': '255:0:0',
+    'baikin.png': '200:0:255',
+    'cheeze.png': '255:50:0',
+    'dokin.png': '255:50:0',
+    'kare.png': '255:50:50',
+    'kokin.png': '10:10:255',
+    'meron.png': '255:200:0',
+    'shoku.png': '255:255:255'
 }
 
 swithLED = switchbot_led_test.SwitchBotAPI()
@@ -100,22 +100,22 @@ def index():
     #    add_color_dict(os.path.join(icon_dir, image))
 
     # 中心画像
-    center_image = "light.jpg"
+    center_image = 'light.jpg'
 
     # 前回のヘッダー作成から3分経過している場合、ヘッダーを再作成
     if (time.time() - swithLED.header_created_at) > 180:
         swithLED.header = swithLED.create_header()
         swithLED.header_created_at = time.time()
-        logger.info(f"Event: create_header, Header: {swithLED.header}")
+        logger.info(f'Event: create_header, Header: {swithLED.header}')
 
         swithLED.devices = swithLED.get_devices()
-        swithLED.bulb_device_id = swithLED.get_deviceID_by_name("ダイニング")
-        swithLED.tape_device_id = swithLED.get_deviceID_by_name("テープライト")
+        swithLED.bulb_device_id = swithLED.get_deviceID_by_name('ダイニング')
+        swithLED.tape_device_id = swithLED.get_deviceID_by_name('テープライト')
         print(swithLED.bulb_device_id, swithLED.tape_device_id)
 
-        logger.info(f"Event: get_devices, Devices: {swithLED.devices}")
+        logger.info(f'Event: get_devices, Devices: {swithLED.devices}')
     else:
-        print("Header is still valid.")
+        print('Header is still valid.')
 
     return render_template('index.html', center_image=center_image, images=selected_images_paths)
 
@@ -130,7 +130,7 @@ def change_light_color():
         #swithLED.turn_on(swithLED.bulb_device_id)
         swithLED.toggle(swithLED.bulb_device_id)
         time.sleep(3)
-        logger.info(f"Event: toggle, DeviceID: {swithLED.bulb_device_id}")
+        logger.info(f'Event: toggle, DeviceID: {swithLED.bulb_device_id}')
 
         swithLED.bulb_is_on = True
 
@@ -143,7 +143,7 @@ def change_light_color():
             time.sleep(0.5)
         
             response = swithLED.set_color(swithLED.tape_device_id, swithLED.last_color)
-            logger.info(f"Event: Switch to tape, DeviceID: {swithLED.tape_device_id}, Color: {swithLED.last_color}, Image: {image_name}")
+            logger.info(f'Event: Switch to tape, DeviceID: {swithLED.tape_device_id}, Color: {swithLED.last_color}, Image: {image_name}')
 
             swithLED.tape_is_on = True
             swithLED.bulb_is_on = False
@@ -157,7 +157,7 @@ def change_light_color():
         
             response = swithLED.set_color(swithLED.bulb_device_id, swithLED.last_color)
             time.sleep(3)
-            logger.info(f"Event: Switch to bulb, DeviceID: {swithLED.bulb_device_id}, Color: {swithLED.last_color}, Image: {image_name}")
+            logger.info(f'Event: Switch to bulb, DeviceID: {swithLED.bulb_device_id}, Color: {swithLED.last_color}, Image: {image_name}')
 
             swithLED.tape_is_on = False
             swithLED.bulb_is_on = True
@@ -168,12 +168,12 @@ def change_light_color():
 
         # デバイスIDが見つからない場合の処理
         if not swithLED.bulb_device_id:
-            return "Device not found", 404
+            return 'Device not found', 404
         
         if image_name in color_dict:
             color = color_dict[image_name]
         else:
-            return "Color not found", 404
+            return 'Color not found', 404
         
         if swithLED.tape_is_on:
             swithLED.turn_off(swithLED.tape_device_id)
@@ -184,7 +184,7 @@ def change_light_color():
 
         response = swithLED.set_color(swithLED.bulb_device_id, color)
         time.sleep(3)
-        logger.info(f"Event: set_color, DeviceID: {swithLED.bulb_device_id}, Color: {color}, Image: {image_name}")
+        logger.info(f'Event: set_color, DeviceID: {swithLED.bulb_device_id}, Color: {color}, Image: {image_name}')
 
         return '', 204  # レスポンスボディなし、ステータスコード204で終了
 
@@ -249,7 +249,7 @@ def get_stats_data():
                 stats['evens_per_image'][image] = 0
             stats['evens_per_image'][image] += 1
 
-        return render_template("stats.html", stats=json.dumps(stats), icon_dirs=json.dumps(ICON_NAME_DICT), color_dict=json.dumps(color_dict))
+        return render_template('stats.html', stats=json.dumps(stats), icon_dirs=json.dumps(ICON_NAME_DICT), color_dict=json.dumps(color_dict))
     except FileNotFoundError:
         return {'error': 'Log file not found.'}, 404
     

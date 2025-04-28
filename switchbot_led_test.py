@@ -24,8 +24,8 @@ class SwitchBotAPI:
 
         # デバイス情報を取得
         self.devices = self.get_devices()
-        self.bulb_device_id = self.get_deviceID_by_name("ダイニング")
-        self.tape_device_id = self.get_deviceID_by_name("テープライト")
+        self.bulb_device_id = self.get_deviceID_by_name('ダイニング')
+        self.tape_device_id = self.get_deviceID_by_name('テープライト')
         print(self.bulb_device_id, self.tape_device_id)
 
         self.last_color = None
@@ -64,70 +64,70 @@ class SwitchBotAPI:
         if response.status_code == 200:
             return response.json()
         else:
-            return f"Error: {response.status_code}, {response.json()}"
+            return f'Error: {response.status_code}, {response.json()}'
 
     def turn_on(self, device_id: str):
         url = f'{self.switchbot_hostname}/{device_id}/commands'
         payload = {
             'command': 'turnOn', 
-            "parameter": 'default',
+            'parameter': 'default',
         }
         response = requests.post(url, headers=self.header, json=payload)
 
         if response.status_code == 200:
             return response.json()
         else:
-            return f"Error: {response.status_code}, {response.json()}"
+            return f'Error: {response.status_code}, {response.json()}'
 
     def turn_off(self, device_id: str):
         url = f'{self.switchbot_hostname}/{device_id}/commands'
         payload = {
             'command': 'turnOff', 
-            "parameter": 'default'
+            'parameter': 'default'
         }
         response = requests.post(url, headers=self.header, json=payload)
         if response.status_code == 200:
             return response.json()
         else:
-            return f"Error: {response.status_code}, {response.json()}"
+            return f'Error: {response.status_code}, {response.json()}'
         
     # トグル
     def toggle(self, device_id: str):
         url = f'{self.switchbot_hostname}/{device_id}/commands'
         payload = {
             'command': 'toggle', 
-            "parameter": 'default',
+            'parameter': 'default',
         }
         response = requests.post(url, headers=self.header, json=payload)
         if response.status_code == 200:
             return response.json()
         else:
-            return f"Error: {response.status_code}, {response.json()}"
+            return f'Error: {response.status_code}, {response.json()}'
 
     def set_color(self, device_id: str, color: str):
         url = f'{self.switchbot_hostname}/{device_id}/commands'
         payload = {
             'command': 'setColor', 
-            "parameter": color
+            'parameter': color
         }
         response = requests.post(url, headers=self.header, json=payload)
         if response.status_code == 200:
             self.last_color = color
             return response.json()
         else:
-            return f"Error: {response.status_code}, {response.json()}"
+            return f'Error: {response.status_code}, {response.json()}'
         
     def set_cct(self, device_id: str, cct: int):
         url = f'{self.switchbot_hostname}/{device_id}/commands'
         payload = {
             'command': 'setColorTemperature', 
-            "parameter": cct,
+            'parameter': cct,
         }
         response = requests.post(url, headers=self.header, json=payload)
         if response.status_code == 200:
             return response.json()
         else:
-            return f"Error: {response.status_code}, {response.json()}"
+            return f'Error: {response.status_code}, {response.json()}'
 
     def get_deviceID_by_name(self, name: str):
         if isinstance(self.devices, dict) and 'body' in self.devices and 'deviceList' in self.devices['body']:
@@ -142,13 +142,13 @@ class SwitchBotAPI:
         return response.json()
 
 # 使用例
-if __name__ == "__main__":
+if __name__ == '__main__':
     api = SwitchBotAPI()
 
     devices = api.get_devices()
     print(devices)
 
-    device_name = "ダイニング"
+    device_name = 'ダイニング'
     device_id = api.get_deviceID_by_name(device_name)
 
     if device_id:
